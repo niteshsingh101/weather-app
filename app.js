@@ -1,10 +1,31 @@
 const request = require('request');
+const yargs = require('yargs');
+const geocode = require('./geocode/geocode');
+const weather = require('./weather/weather');
+// const argv = yargs.option({
+//   a: {
+//     demand: true,
+//     alias: 'address',
+//     describe: 'Fetch address from console',
+//     string: true
+//   }
+// }).help()
+// .alias('help', 'h')
+// .argv;
+//console.log(argv);
 
-request({
-  url: 'http://localhost:3000/api',
-  json: true
-}, (err, response, body) => {
-  console.log(`Adress: ${body.results[0].formatted_address}`);
-  console.log(`Lat: ${body.results[0].geometry.location.lat}`);
-  console.log(`Lng: ${body.results[0].geometry.location.lng}`);
+
+
+geocode.geocodeAddress((err, result) => {
+  if (err) {
+    console.log(err);
+  }
+  else{
+    weather.getWeather(result.lat, result.lng, (err, weatherResult) => {
+      if(err){
+        console.log("Unable to fetch weather !");
+      }
+      console.log(`Todday's temperature is: ${weatherResult.temperature} it's feel like ${weatherResult.apparentTemperature}`);
+    });
+  }
 });
